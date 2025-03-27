@@ -341,8 +341,8 @@ app.get('/settings', (req, res) => {
             localStorage.setItem('cct', cct);
             localStorage.setItem('dimmer', dimmer);
             
-            // Redirect to recommendations page
-            window.location.href = '/recommendations';
+            // Redirect to recommendations page with current settings as query parameters
+            window.location.href = \`/recommendations?brightness=\${brightness}&cct=\${cct}&dimmer=\${dimmer}\`;
           });
         });
       </script>
@@ -478,7 +478,19 @@ app.get('/recommendations', (req, res) => {
         
         // Fetch recommendations function
         function fetchRecommendations(userId) {
-          fetch(\`/api/recommendations?userId=\${userId}\`)
+          // Get URL parameters
+          const urlParams = new URLSearchParams(window.location.search);
+          const brightness = urlParams.get('brightness');
+          const cct = urlParams.get('cct');
+          const dimmer = urlParams.get('dimmer');
+          
+          // Build API URL with current settings
+          let apiUrl = \`/api/recommendations?userId=\${userId}\`;
+          if (brightness) apiUrl += \`&brightness=\${brightness}\`;
+          if (cct) apiUrl += \`&cct=\${cct}\`;
+          if (dimmer) apiUrl += \`&dimmer=\${dimmer}\`;
+          
+          fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
               const container = document.getElementById('recommendations-container');
@@ -539,43 +551,69 @@ app.get('/recommendations', (req, res) => {
   `);
 });
 
-// API endpoint to simulate recommendations
+// API endpoint to generate dynamic recommendations
 app.get('/api/recommendations', (req, res) => {
-  // Simulate a recommendation response
-  const recommendations = {
-    userId: req.query.userId || "user123",
-    recommendations: [
-      {
-        id: "brightness_75_cct_3500_dimmer_60",
+  const userId = req.query.userId || "user123";
+  
+  // Generate 3 random recommendations
+  const generateRandomRecommendations = () => {
+    const recommendations = [];
+    
+    // Get current settings from query parameters if available
+    const currentBrightness = parseInt(req.query.brightness) || 70;
+    const currentCct = parseInt(req.query.cct) || 4000;
+    const currentDimmer = parseInt(req.query.dimmer) || 50;
+    
+    // Generate 3 unique recommendations
+    for (let i = 0; i < 3; i++) {
+      // Generate random variations based on current settings
+      // This ensures recommendations are somewhat relevant to user's current settings
+      
+      // Random brightness between ±25% of current, but within bounds
+      const brightness = Math.min(Math.max(
+        Math.round(currentBrightness + (Math.random() * 50 - 25)), 
+        5), 100);
+      
+      // Random CCT between ±1000K of current, but within bounds
+      const colorTemperature = Math.min(Math.max(
+        Math.round(currentCct + (Math.random() * 2000 - 1000)), 
+        2700), 6500);
+      
+      // Random dimmer between ±20% of current, but within bounds
+      const dimmerRate = Math.min(Math.max(
+        Math.round(currentDimmer + (Math.random() * 40 - 20)), 
+        0), 100);
+      
+      // Generate a random confidence score between 0.5 and 0.98
+      const confidence = (Math.random() * 0.48 + 0.5).toFixed(2);
+      
+      // Format the ID
+      const id = `brightness_${brightness}_cct_${colorTemperature}_dimmer_${dimmerRate}`;
+      
+      recommendations.push({
+        id,
         settings: {
-          brightness: 75,
-          colorTemperature: 3500,
-          dimmerRate: 60
+          brightness,
+          colorTemperature,
+          dimmerRate
         },
-        confidence: 0.89
-      },
-      {
-        id: "brightness_80_cct_4000_dimmer_50",
-        settings: {
-          brightness: 80,
-          colorTemperature: 4000,
-          dimmerRate: 50
-        },
-        confidence: 0.76
-      },
-      {
-        id: "brightness_65_cct_3000_dimmer_70",
-        settings: {
-          brightness: 65,
-          colorTemperature: 3000,
-          dimmerRate: 70
-        },
-        confidence: 0.65
-      }
-    ]
+        confidence: parseFloat(confidence)
+      });
+    }
+    
+    // Sort by confidence (highest first)
+    recommendations.sort((a, b) => b.confidence - a.confidence);
+    
+    return recommendations;
   };
   
-  res.json(recommendations);
+  // Create the response object
+  const response = {
+    userId,
+    recommendations: generateRandomRecommendations()
+  };
+  
+  res.json(response);
 });
 
 // Start the server
