@@ -290,8 +290,34 @@ app.get('/settings', (req, res) => {
           document.getElementById('logout-link').addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('userId');
+            localStorage.removeItem('brightness');
+            localStorage.removeItem('cct');
+            localStorage.removeItem('dimmer');
             window.location.href = '/';
           });
+          
+          // Load saved settings from localStorage if they exist
+          const savedBrightness = localStorage.getItem('brightness');
+          const savedCct = localStorage.getItem('cct');
+          const savedDimmer = localStorage.getItem('dimmer');
+          
+          if (savedBrightness) {
+            document.getElementById('brightness').value = savedBrightness;
+            document.getElementById('brightness-value').textContent = savedBrightness;
+            document.getElementById('current-brightness').textContent = savedBrightness;
+          }
+          
+          if (savedCct) {
+            document.getElementById('cct').value = savedCct;
+            document.getElementById('cct-value').textContent = savedCct;
+            document.getElementById('current-cct').textContent = savedCct;
+          }
+          
+          if (savedDimmer) {
+            document.getElementById('dimmer').value = savedDimmer;
+            document.getElementById('dimmer-value').textContent = savedDimmer;
+            document.getElementById('current-dimmer').textContent = savedDimmer;
+          }
           
           // Update current settings display when sliders change
           document.querySelectorAll('.slider').forEach(slider => {
@@ -413,6 +439,9 @@ app.get('/recommendations', (req, res) => {
           document.getElementById('logout-link').addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('userId');
+            localStorage.removeItem('brightness');
+            localStorage.removeItem('cct');
+            localStorage.removeItem('dimmer');
             window.location.href = '/';
           });
           
