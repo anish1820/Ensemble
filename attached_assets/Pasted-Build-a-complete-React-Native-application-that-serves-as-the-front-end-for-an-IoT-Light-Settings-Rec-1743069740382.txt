@@ -1,0 +1,27 @@
+Build a complete React Native application that serves as the front-end for an IoT Light Settings Recommendation System powered by AWS Personalize. The app must meet the following requirements based on the system design document:
+User Identification & Login:
+Create a simple login screen where users can enter their unique USER_ID. This will be used to fetch personalized recommendations.
+Validate and store the USER_ID in the app’s state or local storage.
+Fetching Recommendations:
+After login, the app should call the AWS Personalize get_recommendations API to fetch personalized light settings (e.g., brightness, CCT, and dimmer rate) for the logged-in user.
+Handle asynchronous API calls with proper error handling and loading states.
+Use AWS Amplify or AWS SDK for JavaScript to simplify integration with AWS services.
+Display & Adjustment UI:
+Design a main screen that displays the recommended light settings using interactive UI components:
+Use sliders or input fields for brightness, CCT, and dimmer rate.
+Clearly show the recommended (default) settings and allow the user to manually adjust them.
+Ensure the UI is responsive and intuitive for an IoT control scenario.
+User Feedback Integration:
+When a user manually adjusts the settings, capture these changes as feedback.
+Construct a feedback event (including USER_ID, a timestamp in Unix epoch format, and an ITEM_ID that uniquely represents the new settings in the format "brightness:VALUE|cct:VALUE|dimmer:VALUE").
+Send the feedback data to AWS Personalize using the Event Tracker API (simulate this via a REST endpoint if needed).
+Navigation & Code Structure:
+Use React Navigation to manage transitions between the login screen and the main recommendation screen.
+Organize the code in a modular fashion, with separate components for the login, recommendation display, and settings adjustment.
+Incorporate state management (via React hooks or a state management library) to handle user data and API responses.
+Additional Requirements:
+Include inline comments that explain key functions and components.
+Provide error handling and user-friendly messages in case of API failures.
+Assume AWS credentials and configuration are handled via AWS Amplify or appropriate environment settings.
+Optionally, add simple styling to ensure a clean and modern UI.
+Your final output should be a self-contained React Native codebase (using either Expo or react-native-cli) that meets all these requirements and serves as a prototype for the IoT Light Settings Recommendation System.
